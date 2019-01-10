@@ -19,6 +19,15 @@ wss.on("connection", function(ws) {
     ws.send(JSON.stringify(new Date()), function() {});
   }, 1000);
 
+  ws.on("message", function incoming(data) {
+    // Broadcast to everyone else.
+    wss.clients.forEach(function each(client) {
+      if (client !== ws && client.readyState === WebSocket.OPEN) {
+        client.send(data);
+      }
+    });
+  });
+
   console.log("websocket connection open");
 
   ws.on("close", function() {
